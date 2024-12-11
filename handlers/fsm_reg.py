@@ -16,7 +16,7 @@ class FSMReg(StatesGroup):
 
 
 async def start_fsm_reg(message: types.Message):
-    await message.answer('Введите свое фио:')
+    await message.answer('Введите свое фио:', reply_markup=cancel_markup)
     await FSMReg.fullname.set()
 
 async def load_fullname(message: types.Message, state: FSMContext):
@@ -78,7 +78,20 @@ async def load_submit(message: types.Message, state: FSMContext):
     else:
         await message.answer('Введите Да или Нет!')
 
+async def cancel_fsm(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+
+    # kb = ReplyKeyboardRemove()
+
+    if current_state is not None:
+        await state.finish()
+        await message.answer('Отменено!', reply_markup=start_markup)
+
+
 def register_fsmreg_handlers(dp: Dispatcher):
+    dp.register_message_handler(cancel_fsm, Text(equals='отмена',
+                                                 ignore_case=True), state='*')
+
     dp.register_message_handler(start_fsm_reg, commands=['registration'])
     dp.register_message_handler(load_fullname, state=FSMReg.fullname)
     dp.register_message_handler(load_age, state=FSMReg.Age)

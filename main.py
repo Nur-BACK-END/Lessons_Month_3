@@ -1,31 +1,27 @@
 # main.py
-from aiogram import types, executor
-from Config import bot, dp
+from aiogram import executor
+from config import bot, dp, Admins
 import logging
-import os
+from handlers import commands, echo, quiz, fsm_reg
+import buttons
 
-@dp.message_handler(commands=["start", "help"])
-async def start_handler(message: types.Message):
-    await bot.send_message(chat_id=message.from_user.id,
-                           text=f'Hello {message.from_user.first_name}!\n'
-                                f'Твой Telegram ID - {message.from_user.id}')
+async def on_startup(_):
+    for admin in Admins:
+        await bot.send_message(chat_id=admin, text='Бот включен!',
+                               reply_markup=buttons.start_markup)
 
-@dp.message_handler(commands=["mem"])
-async def mem_handler(message: types.Message):
-    photo_path = os.path.join('media', 'img.png')
-    with open(photo_path, 'rb') as photo:
-        await message.answer_photo(photo=photo, caption='Мемчик')
+async def on_shutdown(_):
+    for admin in Admins:
+        await bot.send_message(chat_id=admin, text='Бот выключен!')
 
-#  =====================================================
-@dp.message_handler()
-async def echo_handler(message: types.Message):
-    if message.text.isdigit():
-        number = int(message.text)
-        result = number ** 2
-        await message.answer(result)
-    else:
-        await message.answer(message.text)
+
+commands.register_commands_handlers(dp)
+quiz.register_quiz_handlers(dp)
+fsm_reg.register_fsmreg_handlers(dp)
+
+echo.register_echo_handlers(dp)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup,
+                           on_shutdown=on_shutdown)
