@@ -1,9 +1,11 @@
 # main.py
+from HomeWorks.fsm_shop import register_fsm_shop
 from aiogram import executor
 from config import bot, dp, Admins
 import logging
 from handlers import commands, echo, quiz, fsm_reg
 import buttons
+
 
 async def on_startup(_):
     for admin in Admins:
@@ -18,6 +20,8 @@ async def on_shutdown(_):
 commands.register_commands_handlers(dp)
 quiz.register_quiz_handlers(dp)
 fsm_reg.register_fsmreg_handlers(dp)
+
+register_fsm_shop(dp)
 
 echo.register_echo_handlers(dp)
 

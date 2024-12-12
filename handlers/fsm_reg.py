@@ -6,6 +6,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from buttons import cancel_markup, start_markup
 from aiogram.types import ReplyKeyboardRemove
 
+
 class FSMReg(StatesGroup):
     fullname = State()
     Age = State()

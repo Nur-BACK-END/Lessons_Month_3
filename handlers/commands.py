@@ -1,6 +1,7 @@
 # commands.py
 from aiogram import types, Dispatcher
 import os
+from .echo import game
 from config import bot
 
 
@@ -19,3 +20,5 @@ async def mem_handler(message: types.Message):
 def register_commands_handlers(dp: Dispatcher):
     dp.register_message_handler(start_handler, commands=['start'])
     dp.register_message_handler(mem_handler, commands=['mem'])
+    dp.register_message_handler(game, commands=['game'])
+
