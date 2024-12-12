@@ -1,5 +1,5 @@
 # main.py
-from HomeWorks.fsm_shop import register_fsm_shop
+from handlers.fsm_shop import register_fsm_shop
 from aiogram import executor
 from config import bot, dp, Admins
 import logging
@@ -11,6 +11,7 @@ async def on_startup(_):
     for admin in Admins:
         await bot.send_message(chat_id=admin, text='Бот включен!',
                                reply_markup=buttons.start_markup)
+
 
 async def on_shutdown(_):
     for admin in Admins:
