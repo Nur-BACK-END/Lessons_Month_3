@@ -5,6 +5,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from buttons import cancel_markup, start_markup
 from aiogram.types import ReplyKeyboardRemove
+from db import main_db
 
 
 class FSMReg(StatesGroup):
@@ -19,6 +20,7 @@ class FSMReg(StatesGroup):
 async def start_fsm_reg(message: types.Message):
     await message.answer('Введите свое фио:', reply_markup=cancel_markup)
     await FSMReg.fullname.set()
+
 
 async def load_fullname(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
@@ -59,16 +61,22 @@ async def load_photo(message: types.Message, state: FSMContext):
     await FSMReg.next()
     await message.answer(f'Верные ли данные?')
     await message.answer_photo(photo=data['photo'],
-                               caption=f'ФИО - {data["fullname"]}\n'
-                             f'Возраст - {data["age"]}\n'
-                             f'Пол - {data["gender"]}\n'
-                             f'Почта - {data["email"]}\n')
+                            caption=f'ФИО - {data["fullname"]}\n'
+                            f'Возраст - {data["age"]}\n'
+                            f'Пол - {data["gender"]}\n'
+                            f'Почта - {data["email"]}\n')
 
 
 async def load_submit(message: types.Message, state: FSMContext):
     if message.text == 'Да':
         async with state.proxy() as data:
-            # Запись в базу
+            await main_db.sql_insert_register(
+                fullname=data["fullname"],
+                age=data['age'],
+                gender=data['gender'],
+                email=data['email'],
+                photo=data['photo']
+            )
             await message.answer('Ваши данные в базе!')
             await state.finish()
 
@@ -78,6 +86,7 @@ async def load_submit(message: types.Message, state: FSMContext):
 
     else:
         await message.answer('Введите Да или Нет!')
+
 
 async def cancel_fsm(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
