@@ -4,9 +4,10 @@ from aiogram.contrib.middlewares import fsm
 
 from config import bot, dp, Admins
 import logging
-from handlers import commands, echo, quiz, fsm_reg, fsm_shop
+from handlers import commands, echo, quiz, fsm_reg, fsm_store
 import buttons
 from db import main_db
+
 
 async def on_startup(_):
     for admin in Admins:
@@ -14,6 +15,8 @@ async def on_startup(_):
                                reply_markup=buttons.start_markup)
     await main_db.database_create_store()
     await main_db.database_create_products_details()
+    await main_db.database_create_collections()
+
 
 async def on_shutdown(_):
     for admin in Admins:
@@ -23,7 +26,7 @@ async def on_shutdown(_):
 commands.register_commands_handlers(dp)
 quiz.register_quiz_handlers(dp)
 fsm_reg.register_fsmreg_handlers(dp)
-fsm_shop.register_fsmstore_handlers(dp)
+fsm_store.register_fsmstore_handlers(dp)
 
 echo.register_echo_handlers(dp)
 
